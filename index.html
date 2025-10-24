@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asignaciones de Andrey Durán</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #111827;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --brand: #f59e0b;
+    --accent: #10b981;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --radius: 20px;
+  }
+  html,body{
+    height:100%;margin:0;background:var(--bg);color:var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  h1{
+    font-size:22px;margin:0 0 16px 0;font-weight:700;color:var(--brand);
+  }
+  .date{
+    font-size:16px;font-weight:600;color:var(--muted);margin-bottom:18px;
+    text-transform:capitalize;
+  }
+  .card{
+    width:90%;max-width:520px;background:#fff;border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:0 4px 24px rgba(0,0,0,.05);
+    padding:28px 24px;text-align:center;transition:all .4s ease;
+  }
+  .task{
+    border-left:4px solid var(--brand);background:#fff8eb;padding:10px 14px;
+    border-radius:12px;margin-bottom:10px;text-align:left;
+  }
+  .task .title{font-weight:600;font-size:15px}
+  .task .meta{font-size:13px;color:var(--muted);margin-top:4px}
+  .task[data-tipo="Presidente"]{border-left-color:#f59e0b;background:#fff8eb;}
+  .task[data-tipo="Perlas"]{border-left-color:#10b981;background:#ecfdf5;}
+  .task[data-tipo="Lector"]{border-left-color:#3b82f6;background:#eff6ff;}
+  .task[data-tipo="Oración"]{border-left-color:#ef4444;background:#fef2f2;}
+  .task[data-tipo="Tesoros"]{border-left-color:#fb923c;background:#fff7ed;}
+  .task[data-tipo="Estudio"]{border-left-color:#0ea5e9;background:#e0f2fe;}
+  .nav{
+    display:flex;justify-content:center;gap:12px;margin-top:24px;flex-wrap:wrap;
+  }
+  button{
+    background:#f3f4f6;border:none;border-radius:999px;padding:10px 18px;
+    font-size:15px;cursor:pointer;color:var(--ink);transition:background .2s;
+  }
+  button:hover{background:#e5e7eb}
+  .hidden{opacity:0;transform:translateY(20px);pointer-events:none}
+</style>
+</head>
+<body>
+<h1>Asignaciones de Andrey Durán</h1>
+<div class="card" id="card"></div>
+<div class="nav">
+  <button id="prev">⟵ Anterior</button>
+  <button id="today">Hoy</button>
+  <button id="next">Siguiente ⟶</button>
+</div>
+
+<script>
+// Datos corregidos: se agregan 13 nov "Perlas" y 18 dic "Estudio (dirige)".
+// Además: 6 nov "Estudio (dirige) + Oración", 13 nov ya no incluye "Oración".
+const asignaciones = [
+  {fecha:"2025-10-30", lista:[
+    {tipo:"Lector", titulo:"Lector — Estudio bíblico de la congregación", lugar:"Auditorio principal"}
+  ]},
+  {fecha:"2025-11-06", lista:[
+    {tipo:"Estudio", titulo:"Dirige el Estudio bíblico de la congregación (30 min.)", lugar:"Auditorio principal"},
+    {tipo:"Oración", titulo:"Oración final", lugar:"Auditorio principal"}
+  ]},
+  {fecha:"2025-11-13", lista:[
+    {tipo:"Perlas", titulo:"Busquemos perlas escondidas (10 min.)", lugar:"Auditorio principal"},
+    {tipo:"Lector", titulo:"Lector — Estudio bíblico de la congregación", lugar:"Auditorio principal"}
+  ]},
+  {fecha:"2025-11-20", lista:[
+    {tipo:"Presidente", titulo:"Presidente y oración de apertura", lugar:"Díaz Mirón"}
+  ]},
+  {fecha:"2025-11-27", lista:[
+    {tipo:"Tesoros", titulo:"Tesoros 1 — “Una esperanza para quien está ‘cargado de culpa’ ” (10 min.)", lugar:"Auditorio principal"}
+  ]},
+  {fecha:"2025-12-11", lista:[
+    {tipo:"Perlas", titulo:"Busquemos perlas escondidas (10 min.)", lugar:"Auditorio principal"}
+  ]},
+  {fecha:"2025-12-18", lista:[
+    {tipo:"Estudio", titulo:"Dirige el Estudio bíblico de la congregación (30 min.)", lugar:"Auditorio principal"},
+    {tipo:"Oración", titulo:"Oración final", lugar:"Auditorio principal"}
+  ]},
+  {fecha:"2025-12-25", lista:[
+    {tipo:"Presidente", titulo:"Presidente y oración de apertura", lugar:"Díaz Mirón"}
+  ]},
+  {fecha:"2026-01-01", lista:[
+    {tipo:"Estudio", titulo:"Dirige el Estudio bíblico de la congregación (30 min.)", lugar:"Auditorio principal"},
+    {tipo:"Oración", titulo:"Oración final", lugar:"Auditorio principal"}
+  ]}
+];
+
+let i=0;
+const card=document.getElementById("card");
+const prev=document.getElementById("prev");
+const next=document.getElementById("next");
+const today=document.getElementById("today");
+
+function formatearFecha(f){
+  const d=new Date(f+"T00:00");
+  const opts={weekday:"long",day:"numeric",month:"long",year:"numeric"};
+  return d.toLocaleDateString("es-MX",opts);
+}
+
+function mostrar(){
+  card.classList.add("hidden");
+  setTimeout(()=>{
+    const dia=asignaciones[i];
+    let html=`<div class="date">${formatearFecha(dia.fecha)}</div>`;
+    dia.lista.forEach(t=>{
+      html+=`<div class="task" data-tipo="${t.tipo}">
+        <div class="title">${t.titulo}</div>
+        <div class="meta">${t.tipo} — ${t.lugar}</div>
+      </div>`;
+    });
+    card.innerHTML=html;
+    card.classList.remove("hidden");
+  },150);
+}
+
+prev.onclick=()=>{if(i>0){i--;mostrar();}};
+next.onclick=()=>{if(i<asignaciones.length-1){i++;mostrar();}};
+today.onclick=()=>{
+  const hoy=new Date();
+  const idx=asignaciones.findIndex(a=>new Date(a.fecha)>=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()));
+  i=idx>=0?idx:asignaciones.length-1;
+  mostrar();
+};
+
+mostrar();
+</script>
+</body>
+</html>
